@@ -8,15 +8,12 @@
         background: #222;
         color: #fff;
       }
-
       #video {
         border: 1px solid green;
       }
-
       #clone {
         border: 1px solid blue;
       }
-
       canvas {
         border: 1px solid red;
         xx-display: none;
@@ -26,15 +23,15 @@
   <body>
     <div>
       <div>
-        <h1>v2.1</h1>
+        <h1>v2.2</h1>
       </div>
       <div style="padding-bottom:15px">
         <select
           style="height: 30px; width: 280px"
           id="select"
           onchange="startCamera()">
-          <option selected value="environment">Back</option>
-          <option value="user">Front</option>
+          <option selected value="user">Front</option>
+          <option value="environment">Back</option>
         </select>
         <button
           type="button"
@@ -100,6 +97,7 @@
       }
 
       function startCamera() {
+        reset();
         navigator.mediaDevices.getUserMedia({
           video: {
               width: 800,
@@ -108,7 +106,6 @@
           }
         })
         .then(function(stream) {
-          var video = document.getElementById('video');
           video.srcObject = stream;
           render();
         })
