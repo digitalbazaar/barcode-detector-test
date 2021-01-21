@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Barcode Detector</title>
+    <style>
+      body {
+        background: #222;
+        color: #fff;
+      }
+      #video {
+        border: 1px solid green;
+      }
+      #clone {
+        border: 1px solid blue;
+      }
+      canvas {
+        border: 1px solid red;
+        xx-display: none;
+      }
+      .topnav {
+        background-color: #333;
+        overflow: hidden;
+      }
+      .topnav a {
+        float: left;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 17px;
+      }
+      .topnav a:hover {
+        background-color: #ddd;
+        color: black;
+      }
+      .topnav a.active {
+        background-color: #4CAF50;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="topnav">
+        <a href="index.html">Video</a>
+        <a href="fileupload1.html">File Upload Barcode Detector</a>
+        <a class="active" href="fileupload2.html">File Upload Zxing</a>
+      </div>
+      <div>
+        <h1>v1.0</h1>
+      </div>
+      <input type="file" id="file" onchange="upload()"/>
+      <button
+        type="button"
+        style="height: 30px; width: 100px"
+        onclick="scan()">
+        Scan
+      </button>
+      <div>
+        <img id="image" src="" style="padding-top:15px; max-width:800px"/>
+      </div>
+      <div id="error"></div>
+      <div>
+          <pre id="decodedText"></pre>
+      </div>
+    </div>
+    <script src="./BigInteger.min.js"></script>
+    <script src="./zxing-pdf417.min.js"></script>
+    <script>
+      function scan() {
+        const canvas = document.createElement('canvas');
+        const canvas_context = canvas.getContext('2d');
+        const image = document.getElementById('image');
+
+        let source;
+        let binarizer;
+        let bitmap;
+
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+
+        canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        try {
+          source = new ZXing.BitmapLuminanceSource(canvas_context, image);
+          binarizer = new ZXing.Common.HybridBinarizer(source);
+          bitmap = new ZXing.BinaryBitmap(binarizer);
+          const decodedData = ZXing.PDF417.PDF417Reader.decode(bitmap, null, false);
+          var decodedText = JSON.stringify(decodedData, null, 4);
+          document.getElementById("decodedText").innerHTML = decodedText;
+          if(decodedData.length > 0) {
+            throw new Error('Done');
+          }
+        } catch (err) {
+          if(err.message === 'Done') {
+            return;
+          }
+          document.getElementById("error").innerHTML = err;
+          throw err;
+        }
+      }
+
+      function upload() {
+        const file = document.getElementById("file").files[0];
+        const image = document.getElementById('image');
+        image.src = URL.createObjectURL(file);
+      }
+
+    </script>
+  </body>
+</html>
