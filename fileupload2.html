@@ -48,14 +48,20 @@
         <a class="active" href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v1.0</h1>
+        <h1>v1.1</h1>
       </div>
       <input type="file" id="file" onchange="upload()"/>
       <button
         type="button"
-        style="height: 30px; width: 100px"
+        style="margin-left: 30px; height: 30px; width: 100px"
         onclick="scan()">
         Scan
+      </button>
+      <button
+        type="button"
+        onclick="reset()"
+        style="margin-left: 30px; height: 30px; width: 100px">
+        Reset
       </button>
       <div>
         <img id="image" src="" style="padding-top:15px; max-width:800px"/>
@@ -99,6 +105,13 @@
           document.getElementById("error").innerHTML = err;
           throw err;
         }
+      }
+
+      function reset() {
+        document.getElementById("decodedText").innerHTML = '';
+        document.getElementById("error").innerHTML = '';
+        document.getElementById("file").value = '';
+        document.getElementById('image').src = '';
       }
 
       function upload() {
