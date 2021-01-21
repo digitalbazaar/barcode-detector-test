@@ -23,7 +23,7 @@
   <body>
     <div>
       <div>
-        <h1>v2.4</h1>
+        <h1>v2.5</h1>
       </div>
       <div style="padding-bottom:15px">
         <select
@@ -79,6 +79,9 @@
         }).then(() => {
           requestAnimationFrame(render);
         }).catch(err => {
+          if(err === 'Done') {
+            return;
+          }
           document.getElementById("error").innerHTML = err;
           throw err;
         })
