@@ -37,12 +37,10 @@
 
                     try {
                         barcodeDetector.detect(canvas).then(barcodes => {
-                          console.log(barcodes);
-                          barcodes.forEach(barcode => console.log(barcodes.rawValue))
                           const decodedText = JSON.stringify(barcodes, null, 2);
                           document.getElementById("decodedText").innerHTML = decodedText;
                           if(barcodes.length > 0) {
-                              throw new Error('Done');
+                            throw new Error('Done');
                           }
                         })
                     } catch (err) {
@@ -57,7 +55,7 @@
                     video: {
                         width: 800,
                     height: 600,
-                    facingMode: "user"
+                    facingMode: "rear"
                     }
                 })
                 .then(function(stream) {
