@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF417 example</title>
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script>
+        (function(window, $, undefined) {
+            $(function() {
+                const barcodeDetector = new BarcodeDetector();
+
+                function render() {
+                    const canvas = document.getElementById('canvas');
+                    const video = document.getElementById('video');
+                    const canvas_context = canvas.getContext('2d');
+                    const image = document.getElementById('image');
+                    // console.log(image);
+                    let source;
+                    let binarizer;
+                    let bitmap;
+
+                    canvas_context.fillStyle="#ff0000";
+                    canvas_context.fillRect(0,0, canvas.width, canvas.height);
+                    canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    // canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    const dataURL = canvas.toDataURL();
+                    image.src = dataURL;
+
+
+                    barcodeDetector.detect(canvas).then(barcodes => {
+                      console.log(barcodes);
+                      barcodes.forEach(barcode => console.log(barcodes.rawValue))
+                    })
+                    .catch((e) => {
+                      console.error("Boo, BarcodeDetection failed: " + e);
+                    });
+
+                    try {
+                        barcodeDetector.detect(canvas).then(barcodes => {
+                          console.log(barcodes);
+                          barcodes.forEach(barcode => console.log(barcodes.rawValue))
+                          const decodedText = JSON.stringify(barcodes, null, 2);
+                          document.getElementById("decodedText").innerHTML = decodedText;
+                          if(barcodes.length > 0) {
+                              throw new Error('Done');
+                          }
+                        })
+                    } catch (err) {
+                      document.getElementById("error").innerHTML = err;
+                        throw err;
+                    }
+
+                    requestAnimationFrame(render);
+                }
+
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: 800,
+                    height: 600,
+                    facingMode: "user"
+                    }
+                })
+                .then(function(stream) {
+                        var video = document.getElementById('video');
+                        video.srcObject = stream;
+                        render();
+                })
+                .catch(function(error) {
+                    console.log('Error', error);
+                })
+            });
+        })(window, window.jQuery);
+    </script>
+    <style>
+        body {
+            background: #222;
+            color: #fff;
+        }
+
+        #video {
+            border: 1px solid green;
+        }
+
+        #clone {
+            border: 1px solid blue;
+        }
+
+        canvas {
+            border: 1px solid red;
+            xx-display: none;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <video autoplay id="video" width="800" height="600"></video>
+
+    <canvas hidden id="canvas" width="800" height="600"></canvas>
+    <div>
+        <div id="error"></div>
+        <div>
+            <pre id="decodedText"></pre>
+        </div>
+        <img hidden id="image" src="https://previews.123rf.com/images/fordzolo/fordzolo1506/fordzolo150600296/41026708-example-white-stamp-text-on-red-backgroud.jpg" width="800" height="600"/>
+    </div>
+</div>
+</body>
+</html>
