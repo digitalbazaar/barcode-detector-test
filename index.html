@@ -10,36 +10,34 @@
                 const barcodeDetector = new BarcodeDetector();
 
                 function render() {
-                    const canvas = document.getElementById('canvas');
-                    const video = document.getElementById('video');
-                    const canvas_context = canvas.getContext('2d');
-                    const image = document.getElementById('image');
-                    // console.log(image);
-                    let source;
-                    let binarizer;
-                    let bitmap;
+                  const canvas = document.getElementById('canvas');
+                  const video = document.getElementById('video');
+                  const canvas_context = canvas.getContext('2d');
+                  const image = document.getElementById('image');
+                  // console.log(image);
+                  let source;
+                  let binarizer;
+                  let bitmap;
 
-                    canvas_context.fillStyle="#ff0000";
-                    canvas_context.fillRect(0,0, canvas.width, canvas.height);
-                    canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    // canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                    // const dataURL = canvas.toDataURL();
-                    // image.src = dataURL;
+                  canvas_context.fillStyle="#ff0000";
+                  canvas_context.fillRect(0,0, canvas.width, canvas.height);
+                  canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                  // canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                  // const dataURL = canvas.toDataURL();
+                  // image.src = dataURL;
 
-                    try {
-                        barcodeDetector.detect(canvas).then(barcodes => {
-                          const decodedText = JSON.stringify(barcodes, null, 2);
-                          document.getElementById("decodedText").innerHTML = decodedText;
-                          if(barcodes.length > 0) {
-                            throw new Error('Done');
-                          }
-                        })
-                    } catch (err) {
-                      document.getElementById("error").innerHTML = err;
-                        throw err;
+                  barcodeDetector.detect(canvas).then(barcodes => {
+                    const decodedText = JSON.stringify(barcodes, null, 2);
+                    document.getElementById("decodedText").innerHTML = decodedText;
+                    if(barcodes.length > 0) {
+                      throw new Error('Done');
                     }
-
+                  }).then(() => {
                     requestAnimationFrame(render);
+                  }).catch(err => {
+                    document.getElementById("error").innerHTML = err;
+                    throw err;
+                  })
                 }
 
                 navigator.mediaDevices.getUserMedia({
