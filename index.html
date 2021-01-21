@@ -79,7 +79,7 @@
         }).then(() => {
           requestAnimationFrame(render);
         }).catch(err => {
-          if(err === 'Done') {
+          if(err.message === 'Done') {
             return;
           }
           document.getElementById("error").innerHTML = err;
