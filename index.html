@@ -23,7 +23,7 @@
   <body>
     <div>
       <div>
-        <h1>v2.2</h1>
+        <h1>v2.3</h1>
       </div>
       <div style="padding-bottom:15px">
         <select
@@ -59,12 +59,6 @@
       let currentStream;
 
       startCamera();
-
-      function stopMediaTracks(stream) {
-        stream.getTracks().forEach(track => {
-          track.stop();
-        });
-      }
 
       function render() {
         const canvas_context = canvas.getContext('2d');
