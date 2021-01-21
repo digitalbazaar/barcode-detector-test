@@ -47,7 +47,7 @@
         <a class="active" href="fileupload.html">File Upload</a>
       </div>
       <div>
-        <h1>v1.1</h1>
+        <h1>v1.2</h1>
       </div>
       <input type="file" id="file" onchange="upload()"/>
       <button
@@ -75,7 +75,7 @@
         // canvas.width = image.naturalWidth;
         // canvas.height = image.naturalHeight;
 
-        canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        // canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
         barcodeDetector.detect(image).then(barcodes => {
           const decodedText = JSON.stringify(barcodes, null, 2);
