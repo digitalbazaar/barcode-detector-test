@@ -23,17 +23,8 @@
                     canvas_context.fillRect(0,0, canvas.width, canvas.height);
                     canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
                     // canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                    const dataURL = canvas.toDataURL();
-                    image.src = dataURL;
-
-
-                    barcodeDetector.detect(canvas).then(barcodes => {
-                      console.log(barcodes);
-                      barcodes.forEach(barcode => console.log(barcodes.rawValue))
-                    })
-                    .catch((e) => {
-                      console.error("Boo, BarcodeDetection failed: " + e);
-                    });
+                    // const dataURL = canvas.toDataURL();
+                    // image.src = dataURL;
 
                     try {
                         barcodeDetector.detect(canvas).then(barcodes => {
