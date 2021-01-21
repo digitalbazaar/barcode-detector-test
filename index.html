@@ -102,8 +102,8 @@
         })
         .then(function(stream) {
           video.srcObject = stream;
-          canvas.height = stream.getVideoTracks()[0].getSettings().height;
-          canvas.width = stream.getVideoTracks()[0].getSettings().width;
+          canvas.height = 360;
+          canvas.width = 640;
           render();
         })
         .catch(function(error) {
