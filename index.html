@@ -23,7 +23,7 @@
   <body>
     <div>
       <div>
-        <h1>v2.7</h1>
+        <h1>v2.8</h1>
       </div>
       <div style="padding-bottom:15px">
         <select
@@ -102,8 +102,8 @@
         })
         .then(function(stream) {
           video.srcObject = stream;
-          canvas.height = stream.getVideoTracks()[0].getSettings().height;
-          canvas.width = stream.getVideoTracks()[0].getSettings().width;
+          canvas.height = 576;
+          canvas.width = 640;
           render();
         })
         .catch(function(error) {
