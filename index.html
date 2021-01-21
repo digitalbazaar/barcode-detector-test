@@ -1,98 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>PDF417 example</title>
-    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script>
-        (function(window, $, undefined) {
-            $(function() {
-                const barcodeDetector = new BarcodeDetector();
-
-                function render() {
-                  const canvas = document.getElementById('canvas');
-                  const video = document.getElementById('video');
-                  const canvas_context = canvas.getContext('2d');
-                  const image = document.getElementById('image');
-                  // console.log(image);
-                  let source;
-                  let binarizer;
-                  let bitmap;
-
-                  canvas_context.fillStyle="#ff0000";
-                  canvas_context.fillRect(0,0, canvas.width, canvas.height);
-                  canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                  // canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                  // const dataURL = canvas.toDataURL();
-                  // image.src = dataURL;
-
-                  barcodeDetector.detect(canvas).then(barcodes => {
-                    const decodedText = JSON.stringify(barcodes, null, 2);
-                    document.getElementById("decodedText").innerHTML = decodedText;
-                    if(barcodes.length > 0) {
-                      throw new Error('Done');
-                    }
-                  }).then(() => {
-                    requestAnimationFrame(render);
-                  }).catch(err => {
-                    document.getElementById("error").innerHTML = err;
-                    throw err;
-                  })
-                }
-
-                navigator.mediaDevices.getUserMedia({
-                    video: {
-                        width: 800,
-                    height: 600,
-                    facingMode: "user"
-                    }
-                })
-                .then(function(stream) {
-                        var video = document.getElementById('video');
-                        video.srcObject = stream;
-                        render();
-                })
-                .catch(function(error) {
-                    console.log('Error', error);
-                })
-            });
-        })(window, window.jQuery);
-    </script>
     <style>
-        body {
-            background: #222;
-            color: #fff;
-        }
+      body {
+        background: #222;
+        color: #fff;
+      }
 
-        #video {
-            border: 1px solid green;
-        }
+      #video {
+        border: 1px solid green;
+      }
 
-        #clone {
-            border: 1px solid blue;
-        }
+      #clone {
+        border: 1px solid blue;
+      }
 
-        canvas {
-            border: 1px solid red;
-            xx-display: none;
-        }
+      canvas {
+        border: 1px solid red;
+        xx-display: none;
+      }
     </style>
-</head>
-<body>
-<div>
+  </head>
+  <body>
     <div>
-      <h1>v1.2</h1>
-    </div>
-    <video autoplay id="video" width="800" height="600"></video>
+      <div>
+        <h1>v1.2</h1>
+      </div>
+      <div style="padding-bottom:15px">
+        <select style="width: 280px" id="select" onchange="startCamera()">
+          <option selected value="environment">Back</option>
+          <option value="user">Front</option>
+        </select>
+      </div>
+      <video autoplay id="video" width="800" height="600"></video>
 
-    <canvas hidden id="canvas" width="800" height="600"></canvas>
-    <div>
+      <canvas hidden id="canvas" width="800" height="600"></canvas>
+      <div>
         <div id="error"></div>
         <div>
-            <pre id="decodedText"></pre>
+          <pre id="decodedText"></pre>
         </div>
         <img hidden id="image" src="https://previews.123rf.com/images/fordzolo/fordzolo1506/fordzolo150600296/41026708-example-white-stamp-text-on-red-backgroud.jpg" width="800" height="600"/>
+      </div>
     </div>
-</div>
-</body>
+    <script>
+      const barcodeDetector = new BarcodeDetector();
+      const canvas = document.getElementById('canvas');
+      const video = document.getElementById('video');
+      const select = document.getElementById('select');
+      let currentStream;
+
+      startCamera();
+
+      function stopMediaTracks(stream) {
+        stream.getTracks().forEach(track => {
+          track.stop();
+        });
+      }
+
+      function render() {
+        const canvas_context = canvas.getContext('2d');
+        let source;
+        let binarizer;
+        let bitmap;
+
+        canvas_context.fillStyle="#ff0000";
+        canvas_context.fillRect(0,0, canvas.width, canvas.height);
+        canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        barcodeDetector.detect(canvas).then(barcodes => {
+          const decodedText = JSON.stringify(barcodes, null, 2);
+          document.getElementById("decodedText").innerHTML = decodedText;
+          if(barcodes.length > 0) {
+            throw new Error('Done');
+          }
+        }).then(() => {
+          requestAnimationFrame(render);
+        }).catch(err => {
+          document.getElementById("error").innerHTML = err;
+          throw err;
+        })
+      }
+
+      function startCamera() {
+        navigator.mediaDevices.getUserMedia({
+          video: {
+              width: 800,
+          height: 600,
+          facingMode: select.value
+          }
+        })
+        .then(function(stream) {
+          var video = document.getElementById('video');
+          video.srcObject = stream;
+          render();
+        })
+        .catch(function(error) {
+          console.log('Error', error);
+        })
+      }
+    </script>
+  </body>
 </html>
