@@ -23,7 +23,7 @@
   <body>
     <div>
       <div>
-        <h1>v2.5</h1>
+        <h1>v2.6</h1>
       </div>
       <div style="padding-bottom:15px">
         <select
@@ -40,15 +40,13 @@
           Reset
         </button>
       </div>
-      <video autoplay id="video" width="800" height="600"></video>
-
-      <canvas hidden id="canvas" width="800" height="600"></canvas>
+      <video autoplay id="video"></video>
+      <canvas hidden id="canvas"></canvas>
       <div>
         <div id="error"></div>
         <div>
           <pre id="decodedText"></pre>
         </div>
-        <img hidden id="image" src="https://previews.123rf.com/images/fordzolo/fordzolo1506/fordzolo150600296/41026708-example-white-stamp-text-on-red-backgroud.jpg" width="800" height="600"/>
       </div>
     </div>
     <script>
@@ -97,9 +95,9 @@
         reset();
         navigator.mediaDevices.getUserMedia({
           video: {
-              width: 800,
-          height: 600,
-          facingMode: select.value
+            width: {min: 1024, ideal: 1280, max: 1920},
+            height: {min: 576, ideal: 720, max: 1080},
+            facingMode: select.value
           }
         })
         .then(function(stream) {
