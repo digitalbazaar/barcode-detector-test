@@ -26,13 +26,22 @@
   <body>
     <div>
       <div>
-        <h1>v2.0</h1>
+        <h1>v2.1</h1>
       </div>
       <div style="padding-bottom:15px">
-        <select style="width: 280px" id="select" onchange="startCamera()">
+        <select
+          style="height: 30px; width: 280px"
+          id="select"
+          onchange="startCamera()">
           <option selected value="environment">Back</option>
           <option value="user">Front</option>
         </select>
+        <button
+          type="button"
+          onclick="reset()"
+          style="height: 30px; width: 100px">
+          Reset
+        </button>
       </div>
       <video autoplay id="video" width="800" height="600"></video>
 
@@ -82,6 +91,12 @@
           document.getElementById("error").innerHTML = err;
           throw err;
         })
+      }
+
+      function reset() {
+        document.getElementById("decodedText").innerHTML = '';
+        document.getElementById("error").innerHTML = '';
+        render();
       }
 
       function startCamera() {
