@@ -51,7 +51,7 @@
         <a class="active" href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v1.2</h1>
+        <h1>v1.3</h1>
       </div>
       <input type="file" id="file" onchange="upload()"/>
       <button
@@ -74,40 +74,22 @@
           <pre id="decodedText"></pre>
       </div>
     </div>
-    <script src="./BigInteger.min.js"></script>
-    <script src="./zxing-pdf417.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
     <script>
       function scan() {
-        const canvas = document.createElement('canvas');
-        const canvas_context = canvas.getContext('2d');
+        const codeReader = new ZXing.BrowserPDF417Reader();
         const image = document.getElementById('image');
 
-        let source;
-        let binarizer;
-        let bitmap;
-
-        canvas.width = image.naturalWidth;
-        canvas.height = image.naturalHeight;
-
-        canvas_context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-        try {
-          source = new ZXing.BitmapLuminanceSource(canvas_context, image);
-          binarizer = new ZXing.Common.HybridBinarizer(source);
-          bitmap = new ZXing.BinaryBitmap(binarizer);
-          const decodedData = ZXing.PDF417.PDF417Reader.decode(bitmap, null, false);
-          var decodedText = JSON.stringify(decodedData, null, 4);
-          document.getElementById("decodedText").innerHTML = decodedText;
-          if(decodedData.length > 0) {
-            throw new Error('Done');
-          }
-        } catch (err) {
-          if(err.message === 'Done') {
-            return;
-          }
-          document.getElementById("error").innerHTML = err;
-          throw err;
-        }
+        codeReader
+          .decodeFromImage(image)
+          .then(result => {
+            const decodedText = JSON.stringify(result, null, 2);
+            document.getElementById("decodedText").innerHTML = decodedText;
+          })
+          .catch(err => {
+            document.getElementById("error").innerHTML = err;
+            throw err;
+          });
       }
 
       function reset() {
