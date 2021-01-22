@@ -14,10 +14,6 @@
       #clone {
         border: 1px solid blue;
       }
-      canvas {
-        border: 1px solid red;
-        xx-display: none;
-      }
       .topnav {
         background-color: #333;
         overflow: hidden;
@@ -57,6 +53,12 @@
       <button
         type="button"
         style="margin-left: 30px; height: 30px; width: 100px"
+        onclick="draw()">
+        Draw
+      </button>
+      <button
+        type="button"
+        style="margin-left: 30px; height: 30px; width: 100px"
         onclick="scan()">
         Scan
       </button>
@@ -67,7 +69,13 @@
         Reset
       </button>
       <div>
-        <img id="image" src="" style="padding-top:15px; max-width:800px"/>
+        <img id="image" src="" style="padding-top:15px"/>
+      </div>
+      <div>
+        <canvas hidden id="canvas" width="800" height="600"></canvas>
+      </div>
+      <div>
+        <img hidden id="contrast" src="" style="padding-top:15px"/>
       </div>
       <div id="error"></div>
       <div>
@@ -78,11 +86,12 @@
     <script>
       function scan() {
         const codeReader = new ZXing.BrowserPDF417Reader();
-        const image = document.getElementById('image');
+        const contrast = document.getElementById('contrast');
 
         codeReader
-          .decodeFromImage(image)
+          .decodeFromImage(contrast)
           .then(result => {
+            console.log('CCCCCCC');
             const decodedText = JSON.stringify(result, null, 2);
             document.getElementById("decodedText").innerHTML = decodedText;
           })
@@ -90,6 +99,16 @@
             document.getElementById("error").innerHTML = err;
             throw err;
           });
+      }
+
+      function draw() {
+        const image = document.getElementById('image');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.filter = 'grayscale(100%) contrast(150%) brightness(350%)';
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+        const contrast = document.getElementById('contrast');
+        contrast.src = canvas.toDataURL();
       }
 
       function reset() {

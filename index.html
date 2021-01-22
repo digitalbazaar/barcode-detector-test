@@ -48,7 +48,7 @@
         <a href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v2.9</h1>
+        <h1>v3.0</h1>
       </div>
       <div style="padding-bottom:20px">
         <select
@@ -91,6 +91,7 @@
 
         canvas_context.fillStyle="#ff0000";
         canvas_context.fillRect(0,0, canvas.width, canvas.height);
+        canvas_context.filter = 'grayscale(100%) contrast(150%) brightness(350%)';
         canvas_context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         barcodeDetector.detect(canvas).then(barcodes => {
@@ -120,15 +121,15 @@
         reset();
         navigator.mediaDevices.getUserMedia({
           video: {
-            width: {min: 1024, ideal: 1280, max: 1920},
-            height: {min: 576, ideal: 720, max: 1080},
+            width: 800,
+            height: 600,
             facingMode: select.value
           }
         })
         .then(function(stream) {
           video.srcObject = stream;
-          canvas.height = 576;
-          canvas.width = 640;
+          canvas.height = 800;
+          canvas.width = 600;
           render();
         })
         .catch(function(error) {
