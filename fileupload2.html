@@ -41,7 +41,7 @@
         <a class="active" href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v1.9</h1>
+        <h1>v2.0</h1>
       </div>
       <input type="file" id="file" onchange="upload()" onclick="reset()"/>
       <button
@@ -56,11 +56,11 @@
         style="margin-left: 30px; height: 30px; width: 100px">
         Reset
       </button>
-      <div>
-        <img hidden id="image" src="" style="padding-top:15px; max-width: 800px;"/>
+      <div style="height: 0;">
+        <img id="image" src="" style="padding-top:15px; max-width: 800px; visibility: hidden;"/>
       </div>
       <div>
-        <canvas hidden id="canvas" width="800" height="600"></canvas>
+        <canvas hidden id="canvas"></canvas>
       </div>
       <div class="slidecontainer" style="display: flex; padding-top:15px">
         <div>
@@ -86,11 +86,12 @@
     <script>
       let brightness = `brightness(${document.getElementById('brightness').value}%)`;
       let contrast = `contrast(${document.getElementById('contrast').value}%)`;
+      let contrasted;
+      let canvas;
+      let ctx;
 
       function scan() {
         const codeReader = new ZXing.BrowserPDF417Reader();
-        const contrasted = document.getElementById('contrasted');
-
         codeReader
           .decodeFromImage(contrasted)
           .then(result => {
@@ -107,25 +108,21 @@
       let drawCalled = false;
 
       function draw() {
-        const image = document.getElementById('image');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
         if(!drawCalled) {
+          canvas = document.getElementById('canvas');
+          canvas.height = image.height;
+          canvas.width = image.width;
+          ctx = canvas.getContext('2d');
           ctx.filter = 'grayscale(100%)';
         }
-        const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
-        const x = (canvas.width / 2) - (image.width / 2) * scale;
-        const y = (canvas.height / 2) - (image.height / 2) * scale;
-        ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
-        const contrasted = document.getElementById('contrasted');
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+        contrasted = document.getElementById('contrasted');
         contrasted.src = canvas.toDataURL();
         drawCalled = true;
       }
 
       function updateBrightness(value) {
         brightness = `brightness(${value}%)`;
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
         ctx.filter = `grayscale(100%) ${brightness} ${contrast}`;
         document.getElementById('brightness-value').value = value + '%';
         draw();
@@ -133,8 +130,6 @@
 
       function updateContrast(value) {
         contrast = `contrast(${value}%)`;
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
         ctx.filter = `grayscale(100%) ${brightness} ${contrast}`;
         document.getElementById('contrast-value').value = value + '%';
         draw();
