@@ -47,9 +47,9 @@
         <a class="active" href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v1.7</h1>
+        <h1>v1.8</h1>
       </div>
-      <input type="file" id="file" onchange="upload()"/>
+      <input type="file" id="file" onchange="upload()" onclick="reset()"/>
       <button
         type="button"
         style="margin-left: 30px; height: 30px; width: 100px"
@@ -69,7 +69,7 @@
         Reset
       </button>
       <div>
-        <img hidden id="image" src="" style="padding-top:15px; max-width: 800px;"/>
+        <img id="image" src="" style="padding-top:15px; max-width: 800px;"/>
       </div>
       <div>
         <canvas hidden id="canvas" width="800" height="600"></canvas>
@@ -98,8 +98,8 @@
         codeReader
           .decodeFromImage(contrasted)
           .then(result => {
-            console.log('CCCCCCC');
             const decodedText = JSON.stringify(result, null, 2);
+            document.getElementById("error").innerHTML = '';
             document.getElementById("decodedText").innerHTML = decodedText;
           })
           .catch(err => {
@@ -118,11 +118,11 @@
           ctx.filter = 'grayscale(100%)';
         }
 
-        const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
-        const x = (canvas.width / 2) - (image.width / 2) * scale;
-        const y = (canvas.height / 2) - (image.height / 2) * scale;
+        // const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
+        // const x = (canvas.width / 2) - (image.width / 2) * scale;
+        // const y = (canvas.height / 2) - (image.height / 2) * scale;
 
-        ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
+        ctx.drawImage(image, 0, 0, image.width, image.height);
         const contrasted = document.getElementById('contrasted');
         contrasted.src = canvas.toDataURL();
         drawCalled = true;
@@ -145,10 +145,16 @@
       }
 
       function reset() {
+        document.getElementById('brightness').value = 100;
+        document.getElementById('contrast').value = 100;
+        brightness = `brightness(${document.getElementById('brightness').value}%)`;
+        let contrast = `contrast(${document.getElementById('contrast').value}%)`;
         document.getElementById("decodedText").innerHTML = '';
         document.getElementById("error").innerHTML = '';
         document.getElementById("file").value = '';
         document.getElementById('image').src = '';
+        document.getElementById('contrasted').src = '';
+        drawCalled = false;
       }
 
       function upload() {
