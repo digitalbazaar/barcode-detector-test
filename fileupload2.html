@@ -47,7 +47,7 @@
         <a class="active" href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v1.4</h1>
+        <h1>v1.5</h1>
       </div>
       <input type="file" id="file" onchange="upload()"/>
       <button
@@ -69,13 +69,17 @@
         Reset
       </button>
       <div>
-        <img id="image" src="" style="padding-top:15px; max-width: 800px;"/>
+        <img hidden id="image" src="" style="padding-top:15px; max-width: 800px;"/>
       </div>
       <div>
         <canvas hidden id="canvas" width="800" height="600"></canvas>
       </div>
+      <div class="slidecontainer">
+        <input type="range" min="0" max="300" value="100" id="brightness" onchange="updateBrightness()">
+        <input type="range" min="0" max="300" value="100" id="contrast" onchange="updateContrast()">
+      </div>
       <div>
-        <img id="contrast" src="" style="padding-top:15px"/>
+        <img id="contrasted" src="" style="padding-top:15px"/>
       </div>
       <div id="error"></div>
       <div>
@@ -84,12 +88,15 @@
     </div>
     <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
     <script>
+      let brightness = `brightness(${document.getElementById('brightness').value}%)`;
+      let contrast = `contrast(${document.getElementById('contrast').value}%)`;
+
       function scan() {
         const codeReader = new ZXing.BrowserPDF417Reader();
-        const contrast = document.getElementById('contrast');
+        const contrasted = document.getElementById('contrasted');
 
         codeReader
-          .decodeFromImage(contrast)
+          .decodeFromImage(contrasted)
           .then(result => {
             console.log('CCCCCCC');
             const decodedText = JSON.stringify(result, null, 2);
@@ -101,14 +108,35 @@
           });
       }
 
+      let drawCalled = false;
+
       function draw() {
         const image = document.getElementById('image');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        ctx.filter = 'grayscale(100%) contrast(150%) brightness(350%)';
+        if(!drawCalled) {
+          ctx.filter = 'grayscale(100%)';
+        }
         ctx.drawImage(image, 0, 0, image.width, image.height);
-        const contrast = document.getElementById('contrast');
-        contrast.src = canvas.toDataURL();
+        const contrasted = document.getElementById('contrasted');
+        contrasted.src = canvas.toDataURL();
+        drawCalled = true;
+      }
+
+      function updateBrightness() {
+        brightness = `brightness(${document.getElementById('brightness').value}%)`;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.filter = `grayscale(100%) ${brightness} ${contrast}`;
+        draw();
+      }
+
+      function updateContrast() {
+        contrast = `contrast(${document.getElementById('contrast').value}%)`;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.filter = `grayscale(100%) ${brightness} ${contrast}`;
+        draw();
       }
 
       function reset() {
@@ -121,6 +149,9 @@
       function upload() {
         const file = document.getElementById("file").files[0];
         const image = document.getElementById('image');
+        image.addEventListener('load', function() {
+          draw();
+        });
         image.src = URL.createObjectURL(file);
       }
 
