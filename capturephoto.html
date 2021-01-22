@@ -172,16 +172,18 @@
         reset();
         navigator.mediaDevices.getUserMedia({
           video: {
-            width: 1280,
-            height: 720,
+            width: {min: 1024, ideal: 1280, max: 1920},
+            height: {min: 576, ideal: 720, max: 1080},
             facingMode: 'environment'
           }
         })
         .then(function(stream) {
           video.srcObject = stream;
-          captureCanvas.height = video.height;
-          captureCanvas.width = video.width;
-          render();
+          video.addEventListener('loadedmetadata', function() {
+            captureCanvas.height = video.videoHeight;
+            captureCanvas.width = video.videoWidth;
+            render();
+          });
         })
         .catch(function(error) {
           console.log('Error', error);
@@ -190,6 +192,8 @@
 
       function render() {
         const captureCtx = captureCanvas.getContext('2d');
+        const rectangleWidth = 800;
+        const rectangleHeight = 400;
         captureCtx.fillStyle="#ff0000";
         captureCtx.fillRect(0,0, captureCanvas.width, captureCanvas.height);
         captureCtx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
@@ -197,26 +201,43 @@
         captureCtx.beginPath();
         captureCtx.strokeStyle = "orange";
         captureCtx.lineWidth = "2";
-        captureCtx.rect(50, 150, 700, 300);
+        console.log(rectangleWidth, captureCanvas.width);
+        captureCtx.rect((
+          captureCanvas.width - rectangleWidth) / 2,
+          (captureCanvas.height - rectangleHeight) / 2,
+          rectangleWidth,
+          rectangleHeight);
         captureCtx.stroke();
 
         captureCtx.beginPath();
-        captureCtx.rect(0, 0, 50, 600);
+        captureCtx.rect(0, 0, (captureCanvas.width - rectangleWidth) / 2, captureCanvas.height);
         captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
         captureCtx.fill();
 
         captureCtx.beginPath();
-        captureCtx.rect(50, 0, 700, 150);
+        captureCtx.rect((
+          captureCanvas.width - rectangleWidth) / 2,
+          0,
+          captureCanvas.width - (captureCanvas.width - rectangleWidth),
+          (captureCanvas.height - rectangleHeight) / 2);
         captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
         captureCtx.fill();
 
         captureCtx.beginPath();
-        captureCtx.rect(750, 0, 50, 600);
+        captureCtx.rect((
+          captureCanvas.width - (captureCanvas.width - rectangleWidth) / 2),
+          0,
+          (captureCanvas.width - rectangleWidth) / 2,
+          captureCanvas.height);
         captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
         captureCtx.fill();
 
         captureCtx.beginPath();
-        captureCtx.rect(50, 450, 700, 150);
+        captureCtx.rect((
+          captureCanvas.width - rectangleWidth) / 2,
+          ((captureCanvas.height - rectangleHeight) / 2) + rectangleHeight,
+          captureCanvas.width - (captureCanvas.width - rectangleWidth),
+          (captureCanvas.height - rectangleHeight) / 2);
         captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
         captureCtx.fill();
 
@@ -231,16 +252,6 @@
           slideContainer.style.display = 'flex';
         });
       }
-
-      // function upload() {
-      //   const file = document.getElementById("file").files[0];
-      //   const image = document.getElementById('image');
-      //   image.addEventListener('load', function() {
-      //     draw();
-      //   });
-      //   image.src = URL.createObjectURL(file);
-      // }
-
     </script>
   </body>
 </html>

@@ -49,7 +49,7 @@
         <a href="capturephoto.html">Capture Photo Zxing</a>
       </div>
       <div>
-        <h1>v3.1</h1>
+        <h1>v3.2</h1>
       </div>
       <div style="padding-bottom:20px">
         <select
@@ -128,9 +128,11 @@
         })
         .then(function(stream) {
           video.srcObject = stream;
-          canvas.height = 1024;
-          canvas.width = 576;
-          render();
+          video.addEventListener('loadedmetadata', function() {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            render();
+          });
         })
         .catch(function(error) {
           console.log('Error', error);
