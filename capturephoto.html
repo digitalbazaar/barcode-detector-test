@@ -38,13 +38,18 @@
       <div class="topnav">
         <a href="index.html">Video</a>
         <a href="fileupload1.html">File Upload Barcode Detector</a>
-        <a class="active" href="fileupload2.html">File Upload Zxing</a>
-        <a href="capturephoto.html">Capture Photo Zxing</a>
+        <a href="fileupload2.html">File Upload Zxing</a>
+        <a class="active" href="capturephoto.html">Capture Photo Zxing</a>
       </div>
       <div>
-        <h1>v2.0</h1>
+        <h1>v1.0</h1>
       </div>
-      <input type="file" id="file" onchange="upload()" onclick="reset()"/>
+      <button
+        type="button"
+        style="height: 30px; width: 100px"
+        onclick="captureImage()">
+        Take Photo
+      </button>
       <button
         type="button"
         style="margin-left: 30px; height: 30px; width: 100px"
@@ -57,13 +62,19 @@
         style="margin-left: 30px; height: 30px; width: 100px">
         Reset
       </button>
-      <div style="height: 0;">
-        <img id="image" src="" style="padding-top:15px; max-width: 800px; visibility: hidden;"/>
+      <div style="margin-top:15px;">
+        <video hidden autoplay id="video" width="800" height="600px"></video>
+      </div>
+      <div>
+        <canvas id="capturecanvas"></canvas>
+      </div>
+      <div style="margin-top:15px">
+        <img hidden id="capture" src=""/>
       </div>
       <div>
         <canvas hidden id="canvas"></canvas>
       </div>
-      <div class="slidecontainer" style="display: flex; padding-top:15px">
+      <div id="slidecontainer" style="display: none;">
         <div>
           <div>Brightness</div>
           <input type="range" min="0" max="300" value="100" id="brightness" oninput="updateBrightness(value)">
@@ -85,11 +96,18 @@
     </div>
     <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
     <script>
+      const video = document.getElementById('video');
       let brightness = `brightness(${document.getElementById('brightness').value}%)`;
       let contrast = `contrast(${document.getElementById('contrast').value}%)`;
-      let contrasted;
+      const captureCanvas = document.getElementById('capturecanvas');
+      const capture = document.getElementById('capture');
+      const slideContainer = document.getElementById('slidecontainer');
       let canvas;
+      let contrasted;
       let ctx;
+      let drawCalled = false;
+
+      startCamera();
 
       function scan() {
         const codeReader = new ZXing.BrowserPDF417Reader();
@@ -106,17 +124,15 @@
           });
       }
 
-      let drawCalled = false;
-
       function draw() {
         if(!drawCalled) {
           canvas = document.getElementById('canvas');
-          canvas.height = image.height;
-          canvas.width = image.width;
+          canvas.height = capture.height;
+          canvas.width = capture.width;
           ctx = canvas.getContext('2d');
           ctx.filter = 'grayscale(100%)';
         }
-        ctx.drawImage(image, 0, 0, image.width, image.height);
+        ctx.drawImage(capture, 0, 0, capture.width, capture.height);
         contrasted = document.getElementById('contrasted');
         contrasted.src = canvas.toDataURL();
         drawCalled = true;
@@ -145,8 +161,6 @@
         contrast = `contrast(${document.getElementById('contrast').value}%)`;
         document.getElementById("decodedText").innerHTML = '';
         document.getElementById("error").innerHTML = '';
-        document.getElementById("file").value = '';
-        document.getElementById('image').src = '';
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -154,14 +168,78 @@
         drawCalled = false;
       }
 
-      function upload() {
-        const file = document.getElementById("file").files[0];
-        const image = document.getElementById('image');
-        image.addEventListener('load', function() {
-          draw();
-        });
-        image.src = URL.createObjectURL(file);
+      function startCamera() {
+        reset();
+        navigator.mediaDevices.getUserMedia({
+          video: {
+            width: 1280,
+            height: 720,
+            facingMode: 'environment'
+          }
+        })
+        .then(function(stream) {
+          video.srcObject = stream;
+          captureCanvas.height = video.height;
+          captureCanvas.width = video.width;
+          render();
+        })
+        .catch(function(error) {
+          console.log('Error', error);
+        })
       }
+
+      function render() {
+        const captureCtx = captureCanvas.getContext('2d');
+        captureCtx.fillStyle="#ff0000";
+        captureCtx.fillRect(0,0, captureCanvas.width, captureCanvas.height);
+        captureCtx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
+
+        captureCtx.beginPath();
+        captureCtx.strokeStyle = "orange";
+        captureCtx.lineWidth = "2";
+        captureCtx.rect(50, 150, 700, 300);
+        captureCtx.stroke();
+
+        captureCtx.beginPath();
+        captureCtx.rect(0, 0, 50, 600);
+        captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
+        captureCtx.fill();
+
+        captureCtx.beginPath();
+        captureCtx.rect(50, 0, 700, 150);
+        captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
+        captureCtx.fill();
+
+        captureCtx.beginPath();
+        captureCtx.rect(750, 0, 50, 600);
+        captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
+        captureCtx.fill();
+
+        captureCtx.beginPath();
+        captureCtx.rect(50, 450, 700, 150);
+        captureCtx.fillStyle = 'rgba(0,0,0,0.5)';
+        captureCtx.fill();
+
+        requestAnimationFrame(render);
+      }
+
+      function captureImage() {
+        capture.src = captureCanvas.toDataURL();
+        capture.addEventListener('load', function() {
+          draw();
+          captureCanvas.style.display = 'none';
+          slideContainer.style.display = 'flex';
+        });
+      }
+
+      // function upload() {
+      //   const file = document.getElementById("file").files[0];
+      //   const image = document.getElementById('image');
+      //   image.addEventListener('load', function() {
+      //     draw();
+      //   });
+      //   image.src = URL.createObjectURL(file);
+      // }
 
     </script>
   </body>
