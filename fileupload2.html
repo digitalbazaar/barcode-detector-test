@@ -8,12 +8,6 @@
         background: #222;
         color: #fff;
       }
-      #video {
-        border: 1px solid green;
-      }
-      #clone {
-        border: 1px solid blue;
-      }
       .topnav {
         background-color: #333;
         overflow: hidden;
@@ -47,15 +41,9 @@
         <a class="active" href="fileupload2.html">File Upload Zxing</a>
       </div>
       <div>
-        <h1>v1.8</h1>
+        <h1>v1.9</h1>
       </div>
       <input type="file" id="file" onchange="upload()" onclick="reset()"/>
-      <button
-        type="button"
-        style="margin-left: 30px; height: 30px; width: 100px"
-        onclick="draw()">
-        Draw
-      </button>
       <button
         type="button"
         style="margin-left: 30px; height: 30px; width: 100px"
@@ -69,17 +57,25 @@
         Reset
       </button>
       <div>
-        <img id="image" src="" style="padding-top:15px; max-width: 800px;"/>
+        <img hidden id="image" src="" style="padding-top:15px; max-width: 800px;"/>
       </div>
       <div>
         <canvas hidden id="canvas" width="800" height="600"></canvas>
       </div>
-      <div class="slidecontainer" style="padding-top:15px">
-        <input type="range" min="0" max="300" value="100" id="brightness" onchange="updateBrightness()">
-        <input type="range" min="0" max="300" value="100" id="contrast" onchange="updateContrast()">
+      <div class="slidecontainer" style="display: flex; padding-top:15px">
+        <div>
+          <div>Brightness</div>
+          <input type="range" min="0" max="300" value="100" id="brightness" oninput="updateBrightness(value)">
+          <output for="brightness" id="brightness-value">100%</output>
+        </div>
+        <div style="margin-left: 20px">
+          <div>Contrast</div>
+          <input type="range" min="0" max="300" value="100" id="contrast" oninput="updateContrast(value)">
+          <output for="contrast" id="contrast-value">100%</output>
+        </div>
       </div>
-      <div>
-        <img id="contrasted" src="" style="padding-top:15px"/>
+      <div style="margin-top:15px">
+        <img id="contrasted" src=""/>
       </div>
       <div id="error"></div>
       <div>
@@ -117,42 +113,47 @@
         if(!drawCalled) {
           ctx.filter = 'grayscale(100%)';
         }
-
-        // const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
-        // const x = (canvas.width / 2) - (image.width / 2) * scale;
-        // const y = (canvas.height / 2) - (image.height / 2) * scale;
-
-        ctx.drawImage(image, 0, 0, image.width, image.height);
+        const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
+        const x = (canvas.width / 2) - (image.width / 2) * scale;
+        const y = (canvas.height / 2) - (image.height / 2) * scale;
+        ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
         const contrasted = document.getElementById('contrasted');
         contrasted.src = canvas.toDataURL();
         drawCalled = true;
       }
 
-      function updateBrightness() {
-        brightness = `brightness(${document.getElementById('brightness').value}%)`;
+      function updateBrightness(value) {
+        brightness = `brightness(${value}%)`;
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         ctx.filter = `grayscale(100%) ${brightness} ${contrast}`;
+        document.getElementById('brightness-value').value = value + '%';
         draw();
       }
 
-      function updateContrast() {
-        contrast = `contrast(${document.getElementById('contrast').value}%)`;
+      function updateContrast(value) {
+        contrast = `contrast(${value}%)`;
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         ctx.filter = `grayscale(100%) ${brightness} ${contrast}`;
+        document.getElementById('contrast-value').value = value + '%';
         draw();
       }
 
       function reset() {
         document.getElementById('brightness').value = 100;
         document.getElementById('contrast').value = 100;
+        document.getElementById('brightness-value').value = 100 + '%';
+        document.getElementById('contrast-value').value = 100 + '%';
         brightness = `brightness(${document.getElementById('brightness').value}%)`;
-        let contrast = `contrast(${document.getElementById('contrast').value}%)`;
+        contrast = `contrast(${document.getElementById('contrast').value}%)`;
         document.getElementById("decodedText").innerHTML = '';
         document.getElementById("error").innerHTML = '';
         document.getElementById("file").value = '';
         document.getElementById('image').src = '';
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         document.getElementById('contrasted').src = '';
         drawCalled = false;
       }
