@@ -42,7 +42,7 @@
         <a class="active" href="capturephoto.html">Capture Photo Zxing</a>
       </div>
       <div>
-        <h1>v1.0</h1>
+        <h1>v1.1</h1>
       </div>
       <button
         type="button"
@@ -63,7 +63,7 @@
         Reset
       </button>
       <div style="margin-top:15px;">
-        <video hidden autoplay id="video" width="800" height="600px"></video>
+        <video hidden autoplay id="video" width="1280" height="720"></video>
       </div>
       <div>
         <canvas id="capturecanvas"></canvas>
@@ -106,6 +106,7 @@
       let contrasted;
       let ctx;
       let drawCalled = false;
+      let imageCapture;
 
       startCamera();
 
@@ -172,16 +173,16 @@
         reset();
         navigator.mediaDevices.getUserMedia({
           video: {
-            width: {min: 1024, ideal: 1280, max: 1920},
-            height: {min: 576, ideal: 720, max: 1080},
+            width: 1280,
+            height: 720,
             facingMode: 'environment'
           }
         })
         .then(function(stream) {
           video.srcObject = stream;
           video.addEventListener('loadedmetadata', function() {
-            captureCanvas.height = video.videoHeight;
-            captureCanvas.width = video.videoWidth;
+            captureCanvas.height = video.height;
+            captureCanvas.width = video.width;
             render();
           });
         })
@@ -201,7 +202,6 @@
         captureCtx.beginPath();
         captureCtx.strokeStyle = "orange";
         captureCtx.lineWidth = "2";
-        console.log(rectangleWidth, captureCanvas.width);
         captureCtx.rect((
           captureCanvas.width - rectangleWidth) / 2,
           (captureCanvas.height - rectangleHeight) / 2,
@@ -252,6 +252,7 @@
           slideContainer.style.display = 'flex';
         });
       }
+
     </script>
   </body>
 </html>
